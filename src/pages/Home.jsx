@@ -33,8 +33,9 @@ const Home = () => {
     return match ? match[1].trim() : response.trim();
   };
 
+  // Gemini API key from .env
   const ai = new GoogleGenAI({
-    apiKey: "AIzaSyAdhXoSBYQ_ZcixaXcNY-VQ6L1kVDEcLWw",
+    apiKey: import.meta.env.VITE_GEMINI_API_KEY,
   });
 
   const getResponse = async () => {
@@ -42,8 +43,10 @@ const Home = () => {
       toast.error("Please describe your component");
       return;
     }
+
     try {
       setLoading(true);
+
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: `Generate a modern, responsive UI component.
@@ -58,6 +61,7 @@ Rules:
       });
 
       const finalCode = extractCode(response.text);
+
       setCode(finalCode);
       setOutputScreen(true);
       setTab(1);
@@ -76,25 +80,48 @@ Rules:
   const downloadFile = () => {
     const blob = new Blob([code], { type: "text/html" });
     const url = URL.createObjectURL(blob);
+
     const link = document.createElement("a");
     link.href = url;
     link.download = "GenUI-Code.html";
     link.click();
+
     URL.revokeObjectURL(url);
+
     toast.success("File downloaded");
   };
 
   const blackStyles = {
-    control: (base) => ({ ...base, backgroundColor: "#09090B", borderColor: "#333" }),
-    menu: (base) => ({ ...base, backgroundColor: "#000" }),
+    control: (base) => ({
+      ...base,
+      backgroundColor: "#09090B",
+      borderColor: "#333",
+    }),
+
+    menu: (base) => ({
+      ...base,
+      backgroundColor: "#000",
+    }),
+
     option: (base, state) => ({
       ...base,
       backgroundColor: state.isFocused ? "#222" : "#000",
       color: "#fff",
     }),
-    singleValue: (base) => ({ ...base, color: "#fff" }),
-    placeholder: (base) => ({ ...base, color: "#888" }),
-    indicatorSeparator: () => ({ display: "none" }),
+
+    singleValue: (base) => ({
+      ...base,
+      color: "#fff",
+    }),
+
+    placeholder: (base) => ({
+      ...base,
+      color: "#888",
+    }),
+
+    indicatorSeparator: () => ({
+      display: "none",
+    }),
   };
 
   return (
@@ -106,12 +133,19 @@ Rules:
 
         {/* LEFT PANEL */}
         <div className="w-full md:w-1/2 bg-[#141319] p-4 sm:p-6 rounded-xl shadow-lg">
-          <h2 className="text-xl sm:text-2xl font-bold">AI Component Generator</h2>
+
+          <h2 className="text-xl sm:text-2xl font-bold">
+            AI Component Generator
+          </h2>
+
           <p className="text-gray-400 mt-1 text-sm sm:text-base">
             Describe your UI and let AI generate clean code
           </p>
 
-          <p className="mt-4 font-semibold">Framework</p>
+          <p className="mt-4 font-semibold">
+            Framework
+          </p>
+
           <Select
             options={options}
             styles={blackStyles}
@@ -120,7 +154,10 @@ Rules:
             className="mt-2"
           />
 
-          <p className="mt-5 font-semibold">Describe your component</p>
+          <p className="mt-5 font-semibold">
+            Describe your component
+          </p>
+
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -128,74 +165,156 @@ Rules:
           />
 
           <div className="flex justify-end mt-4">
+
             <button
               disabled={loading}
               onClick={getResponse}
               className="flex items-center gap-2 px-5 sm:px-6 py-3 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600"
             >
-              {loading ? <ClipLoader size={18} color="white" /> : <BsStars />}
+              {loading ? (
+                <ClipLoader size={18} color="white" />
+              ) : (
+                <BsStars />
+              )}
+
               Generate
             </button>
+
           </div>
         </div>
 
         {/* RIGHT PANEL */}
         <div className="w-full md:w-1/2 bg-[#141319] rounded-xl shadow-lg overflow-hidden">
+
           {!outputScreen ? (
+
             <div className="h-full flex flex-col items-center justify-center text-gray-400">
+
               <div className="p-5 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-3xl">
                 <IoCodeSlash />
               </div>
-              <p className="mt-3">Generated code will appear here</p>
+
+              <p className="mt-3">
+                Generated code will appear here
+              </p>
+
             </div>
+
           ) : (
+
             <>
+
               <div className="flex bg-[#17171C] p-2">
-                <button className={`w-1/2 p-2 ${tab === 1 && "bg-[#333]"}`} onClick={() => setTab(1)}>Code</button>
-                <button className={`w-1/2 p-2 ${tab === 2 && "bg-[#333]"}`} onClick={() => setTab(2)}>Preview</button>
+
+                <button
+                  className={`w-1/2 p-2 ${tab === 1 && "bg-[#333]"}`}
+                  onClick={() => setTab(1)}
+                >
+                  Code
+                </button>
+
+                <button
+                  className={`w-1/2 p-2 ${tab === 2 && "bg-[#333]"}`}
+                  onClick={() => setTab(2)}
+                >
+                  Preview
+                </button>
+
               </div>
 
               <div className="flex justify-between px-4 py-2 bg-[#17171C]">
-                <p className="font-semibold">Editor</p>
+
+                <p className="font-semibold">
+                  Editor
+                </p>
+
                 <div className="flex gap-3">
+
                   {tab === 1 ? (
+
                     <>
-                      <button onClick={copyCode}><IoCopy /></button>
-                      <button onClick={downloadFile}><TiExport /></button>
+                      <button onClick={copyCode}>
+                        <IoCopy />
+                      </button>
+
+                      <button onClick={downloadFile}>
+                        <TiExport />
+                      </button>
                     </>
+
                   ) : (
+
                     <>
-                      <button onClick={() => setIsNewTabOpen(true)}><ImNewTab /></button>
-                      <button><GrRefresh /></button>
+                      <button onClick={() => setIsNewTabOpen(true)}>
+                        <ImNewTab />
+                      </button>
+
+                      <button>
+                        <GrRefresh />
+                      </button>
                     </>
+
                   )}
+
                 </div>
+
               </div>
 
               <div className="h-[50vh] sm:h-[60vh] md:h-[65vh]">
+
                 {tab === 1 ? (
-                  <Editor value={code} height="100%" theme="vs-dark" />
+
+                  <Editor
+                    value={code}
+                    height="100%"
+                    theme="vs-dark"
+                  />
+
                 ) : (
-                  <iframe srcDoc={code} className="w-full h-full bg-white" />
+
+                  <iframe
+                    srcDoc={code}
+                    className="w-full h-full bg-white"
+                  />
+
                 )}
+
               </div>
+
             </>
+
           )}
+
         </div>
+
       </div>
 
       {/* FULL PREVIEW */}
       {isNewTabOpen && (
+
         <div className="fixed inset-0 bg-black z-50">
+
           <div className="flex justify-between p-4 border-b">
-            <h3 className="font-bold text-xl sm:text-3xl">Preview</h3>
+
+            <h3 className="font-bold text-xl sm:text-3xl sp-text">
+              Preview
+            </h3>
+
             <button onClick={() => setIsNewTabOpen(false)}>
               <IoCloseCircle size={26} />
             </button>
+
           </div>
-          <iframe srcDoc={code} className="w-full h-full" />
+
+          <iframe
+            srcDoc={code}
+            className="w-full h-full"
+          />
+
         </div>
+
       )}
+
     </>
   );
 };
